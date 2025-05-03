@@ -1,5 +1,5 @@
 # Skin-Deep-Autosplitter
-Simple Livesplit ASL autosplitter for Skin Deep. Supports autosplitting and load removal.
+Simple Livesplit ASL autosplitter for Skin Deep. Supports autosplitting and load removal. Does not support auto reset as of right now.
 
 # Settings
 **Dont split when leaving vig_hub**
@@ -8,5 +8,3 @@ Simple Livesplit ASL autosplitter for Skin Deep. Supports autosplitting and load
 **Start timer when loading into any map**
 * Check this box to auto start the timer when loading into any map, not just CSS Wobbegong. Useful for ILs
 ---
-**Reset timer whenever map is restarted**
-* Check this box if you want the timer to reset when restarting a map. Useful for ILs
