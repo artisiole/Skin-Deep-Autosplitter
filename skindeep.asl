@@ -7,7 +7,6 @@ startup
 {
 	settings.Add("hubSplit", true, "Don't split when leaving vig_hub");
 	settings.Add("ilMode", false, "Start timer when loading into any map (for ILs)");
-	settings.Add("restartReset", false, "Reset timer whenever map is restarted");
 }
 
 init
@@ -16,6 +15,7 @@ init
 	vars.mapRestart = false;
 
 	vars.totalIgt = 0.0;
+	vars.preLoadMap = ""; vars.postLoadMap = "";
 }
 
 update
@@ -32,11 +32,13 @@ update
 	// so this works i guess.
 	if(vars.delta > 2)
 	{
+		vars.preLoadMap = current.map;
 		vars.loading = true;
 	}
 	
 	else if (vars.delta < 0)
 	{
+		vars.postLoadMap = current.map;
 		vars.loading = false;
 	}
 }
@@ -65,6 +67,8 @@ start
 	{
 		return (current.map != old.map) || vars.mapRestart;
 	}
+
+	vars.mapRestart = false;
 }
 
 isLoading
@@ -82,17 +86,4 @@ gameTime
 	}
 	
 	return TimeSpan.FromSeconds(vars.totalIgt);
-}
-
-reset
-{
-	vars.mapRestart = false;
-	if(settings["restartReset"])
-	{
-		if((current.map == old.map) && (current.mapTime - old.mapTime < 0))
-		{
-			vars.mapRestart = true;
-			return true;
-		}
-	}
 }
