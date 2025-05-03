@@ -69,7 +69,7 @@ start
 
 isLoading
 {
-	return vars.loading;
+	return vars.loading || vars.delta == 0;
 }
 
 gameTime
