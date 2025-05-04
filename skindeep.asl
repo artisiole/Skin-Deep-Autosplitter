@@ -1,6 +1,6 @@
 state("skindeep") {
 	string32 map : 0x010B90E0, 0x490, 0x4;
-	float mapTime: 0x01D9C0C0, 0x0, 0x1F4;
+	float mapTime: 0x01D9C0C0, 0x8, 0x1F4;
 }
 
 startup
@@ -12,10 +12,13 @@ startup
 init
 {
 	vars.loading = false;
-	vars.mapRestart = false;
-
+	vars.loadTimeDiff = 1.0;
+	
+	vars.pauseTime = 0.0;
+	// total IGT of the current level
 	vars.totalIgt = 0.0;
-	vars.preLoadMap = ""; vars.postLoadMap = "";
+	// total IGT across the whole run
+	vars.totalGameIgt = 0.0;
 }
 
 update
@@ -24,35 +27,41 @@ update
 	vars.subOld = old.map.Substring(1, current.map.IndexOf(".")-1);
 
 	vars.delta = current.mapTime - old.mapTime;
-	vars.dDelta = (double)vars.delta;
 	
 	// this is kinda #Scuffed but honestly really who cares
 	// the float at mapTime jumps up a very large amount during loading screens
 	// and then when the load ends it returns to its original value, making the delta negative
-	// so this works i guess.
+	// so this works i guess. also a huge mess now bleh
 	if(vars.delta > 2)
 	{
-		vars.preLoadMap = current.map;
-		vars.loading = true;
-	}
-	
-	else if (vars.delta < 0)
+		vars.loadTimeDiff = current.mapTime;
+	} else if (vars.delta > 0 && current.mapTime < vars.loadTimeDiff){ vars.pauseTime = current.mapTime; }
+
+	if(vars.delta > 2 || vars.delta < 0)
 	{
-		vars.postLoadMap = current.map;
+		vars.loading = true;
+	} else { vars.loading = false;}
+	
+	if (current.mapTime - vars.pauseTime > 0 && current.mapTime - vars.pauseTime < 2)
+	{
 		vars.loading = false;
 	}
 }
 
 split 
 {
-	if(settings["hubSplit"])
+	if(settings["hubSplit"] && current.map != old.map && !vars.subOld.Equals("vig_hub"))
 	{
-		return current.map != old.map && !vars.subOld.Equals("vig_hub");
+		vars.totalGameIgt += vars.totalIgt;
+		vars.totalIgt = 0;
+		return true;
 	}
 	
-	else
+	else if (current.map != old.map)
 	{
-		return current.map != old.map;
+		vars.totalGameIgt += vars.totalIgt;
+		vars.totalIgt = 0;
+		return true;
 	}
 }
 
@@ -60,15 +69,25 @@ start
 {
 	if(!settings["ilMode"])
 	{
-		return (current.map != old.map && vars.subMap.Equals("vig_tutorial")) || vars.mapRestart;
+		if ((current.map != old.map && vars.subMap.Equals("vig_tutorial")))
+		{
+			vars.totalIgt = 0.0;
+			vars.totalGameIgt = 0.0;
+			vars.pauseTime = 0.0;
+			return true;
+		}
 	}
 
 	else
 	{
-		return (current.map != old.map) || vars.mapRestart;
+		if ((current.map != old.map))
+		{
+			vars.totalIgt = 0.0;
+			vars.totalGameIgt = 0.0;
+			vars.pauseTime = 0.0;
+			return true;
+		}
 	}
-
-	vars.mapRestart = false;
 }
 
 isLoading
@@ -78,12 +97,11 @@ isLoading
 
 gameTime
 {
-	// only increment totalIGT if delta isnt going sicko mode due to loads
-	// and the game currently isnt loading
-	if(vars.delta > 0 && vars.delta < 1 && !vars.loading)
+	vars.igtDiff = (current.mapTime) - vars.totalIgt;
+
+	if(!vars.loading && (vars.igtDiff < 1) && (vars.igtDiff > -1))
 	{
-		vars.totalIgt += vars.delta;
-	}
-	
-	return TimeSpan.FromSeconds(vars.totalIgt);
+		vars.totalIgt += vars.igtDiff;
+	} //else { vars.totalIgt = vars.pauseTime;}
+	return TimeSpan.FromSeconds(vars.totalIgt + vars.totalGameIgt);
 }
