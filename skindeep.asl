@@ -57,13 +57,11 @@ update
 		vars.loading = false;
 	}
 
-	//print(vars.pauseTime.ToString());
-
 	// stuff to do as soon as loading back in
-	if(vars.loading == false && vars.onReload == false)
+	if(vars.loading == false && vars.onReload == false && current.mapTime > 0.01)
 	{
-		//print("PRELOAD MAP:" + vars.preLoadMap + " ---> CURRENT MAP: " + vars.subMap);
-		if(vars.preLoadMap == current.map)
+		//lol what is this
+		if(vars.preLoadMap == current.map && current.mapTime < 0.5)
 		{
 			if(!settings["resetMode"]){vars.totalGameIgt += vars.totalIgt;}
 			vars.totalIgt = 0.0;
