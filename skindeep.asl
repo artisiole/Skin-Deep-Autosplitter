@@ -73,6 +73,7 @@ update
 
 split 
 {
+	print(vars.subOld);
 	if(settings["hubSplit"] && current.map != old.map && !vars.subOld.Equals("vig_hub.script"))
 	{
 		vars.totalGameIgt += vars.totalIgt;
@@ -81,7 +82,7 @@ split
 		return true;
 	}
 	
-	else if (current.map != old.map)
+	else if (!settings["hubSplit"] && current.map != old.map)
 	{
 		vars.totalGameIgt += vars.totalIgt;
 		vars.preLoadIgt = 0;
