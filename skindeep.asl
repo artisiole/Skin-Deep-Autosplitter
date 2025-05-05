@@ -58,12 +58,12 @@ update
 	}
 
 	// stuff to do as soon as loading back in
-	if(vars.loading == false && vars.onReload == false && current.mapTime > 0.01)
+	if(vars.loading == false && vars.onReload == false && current.mapTime > 0.1 && current.mapTime == vars.pauseTime)
 	{
 		//lol what is this
 		if(vars.preLoadMap == current.map && current.mapTime < 0.5)
 		{
-			if(!settings["resetMode"]){vars.totalGameIgt += vars.totalIgt;}
+			if(!settings["resetMode"] && vars.subMap != "vig_tutorial.script"){vars.totalGameIgt += vars.totalIgt;}
 			vars.totalIgt = 0.0;
 		}
 
@@ -128,7 +128,7 @@ gameTime
 {
 	vars.igtDiff = (current.mapTime) - vars.totalIgt;
 
-	if(!vars.loading && (vars.igtDiff < 1) && (vars.igtDiff > -1))
+	if(!vars.loading && (vars.igtDiff > -1) && ((vars.igtDiff < 1) || current.mapTime < vars.loadTimeDiff))
 	{
 		vars.totalIgt += vars.igtDiff;
 	} //else { vars.totalIgt = vars.pauseTime;}
