@@ -1,6 +1,6 @@
 state("skindeep") {
-	string32 map : 0x010B90E0, 0x490, 0x4;
-	float mapTime: 0x01D9C0C0, 0x8, 0x1F4;
+	string32 map : 0x00BF3998, 0x0;
+	float mapTime: 0x00BD7DE0, 0x18;
 }
 
 startup
@@ -27,8 +27,8 @@ init
 
 update
 {
-	vars.subMap = current.map.Substring(1);
-	vars.subOld = old.map.Substring(1);
+	vars.subMap = current.map.Substring(0);
+	vars.subOld = old.map.Substring(0);
 
 	vars.delta = current.mapTime - old.mapTime;
 	
@@ -41,7 +41,7 @@ update
 	{
 		vars.loadTimeDiff = current.mapTime;
 	} 
-	else if (vars.delta > 0 && current.mapTime < vars.loadTimeDiff)
+	else if (vars.delta > 0 && current.mapTime < vars.loadTimeDiff && current.mapTime > 0.1)
 	{
 		vars.pauseTime = current.mapTime;
 		vars.preLoadMap = current.map;
@@ -52,7 +52,7 @@ update
 		vars.loading = true;
 	} else { vars.loading = false;}
 	
-	if (current.mapTime - vars.pauseTime > 0 && current.mapTime - vars.pauseTime < 2)
+	if (current.mapTime - vars.pauseTime > 0 && current.mapTime - vars.pauseTime < 2 )
 	{
 		vars.loading = false;
 	}
@@ -61,9 +61,10 @@ update
 	if(vars.loading == false && vars.onReload == false && current.mapTime > 0.1 && current.mapTime == vars.pauseTime)
 	{
 		//lol what is this
-		if(vars.preLoadMap == current.map && current.mapTime < 0.5)
+		if(vars.preLoadMap == current.map && current.mapTime < 0.5 && vars.totalIgt < vars.loadTimeDiff) // && !settings["hubSplit"]
 		{
-			if(!settings["resetMode"] && vars.subMap != "vig_tutorial.script"){vars.totalGameIgt += vars.totalIgt;}
+			if(!settings["resetMode"] && vars.subMap != "vig_tutorial")
+			{vars.totalGameIgt += vars.totalIgt;}
 			vars.totalIgt = 0.0;
 		}
 
@@ -73,13 +74,15 @@ update
 
 split 
 {
-	print(vars.subOld);
-	if(settings["hubSplit"] && current.map != old.map && !vars.subOld.Equals("vig_hub.script"))
+	// TODO: Fix time being added to split twice? Might be related to the update() method
+	if(settings["hubSplit"] && current.map != old.map)
 	{
 		vars.totalGameIgt += vars.totalIgt;
 		vars.preLoadIgt = 0;
 		vars.totalIgt = 0;
-		return true;
+
+		if(!vars.subOld.Equals("vig_hub"))
+		{return true;}
 	}
 	
 	else if (!settings["hubSplit"] && current.map != old.map)
@@ -96,8 +99,9 @@ start
 {
 	if(!settings["ilMode"])
 	{
-		if ((current.map != old.map && vars.subMap.Equals("vig_tutorial.script")))
+		if ((current.map != old.map && vars.subMap.Equals("vig_tutorial")))
 		{
+			vars.loadTimeDiff = 0.0;
 			vars.totalIgt = 0.0;
 			vars.totalGameIgt = 0.0;
 			vars.preLoadIgt = 0.0;
@@ -110,6 +114,7 @@ start
 	{
 		if ((current.map != old.map))
 		{
+			vars.loadTimeDiff = 0.0;
 			vars.totalIgt = 0.0;
 			vars.totalGameIgt = 0.0;
 			vars.preLoadIgt = 0.0;
@@ -129,9 +134,11 @@ gameTime
 {
 	vars.igtDiff = (current.mapTime) - vars.totalIgt;
 
-	if(!vars.loading && (vars.igtDiff > -1) && ((vars.igtDiff < 1) || current.mapTime < vars.loadTimeDiff))
+	//grrrrrrrrrrrrr
+	if(!vars.loading && (vars.igtDiff > -1) && (vars.igtDiff < 5) && ((vars.igtDiff < 1) || current.mapTime < vars.loadTimeDiff))
 	{
-		vars.totalIgt += vars.igtDiff;
-	} //else { vars.totalIgt = vars.pauseTime;}
+		//print(current.mapTime.ToString() + " " + vars.loadTimeDiff.ToString());
+		vars.totalIgt = current.mapTime;
+	}
 	return TimeSpan.FromSeconds(vars.totalIgt + vars.totalGameIgt);
 }
