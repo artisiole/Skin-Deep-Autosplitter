@@ -1,6 +1,6 @@
 state("skindeep") {
-	string32 map : 0x00BF3998, 0x0;
-	float mapTime: 0x00BD7DE0, 0x18;
+	string32 map : 0x00BF6A68, 0x0;
+	float mapTime: 0x00BDAE40, 0x18;
 }
 
 startup
