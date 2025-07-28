@@ -1,6 +1,8 @@
 state("skindeep") {
-	string32 map : 0x00BF6A68, 0x0;
-	float mapTime: 0x00BDAE40, 0x18;
+	// todo: support most common versions of game and allow switching with a setting
+	// these are for 2025.05.05.2010
+	string32 map : 0x00C90AB8, 0x4;
+	float mapTime: 0x00BD7DE0, 0x18;
 }
 
 startup
