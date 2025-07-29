@@ -29,8 +29,8 @@ init
 
 update
 {
-	vars.subMap = current.map.Substring(0);
-	vars.subOld = old.map.Substring(0);
+	vars.subMap = current.map.Substring(1);
+	vars.subOld = old.map.Substring(1);
 
 	vars.delta = current.mapTime - old.mapTime;
 	
