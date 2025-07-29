@@ -1,5 +1,5 @@
 # Skin-Deep-Autosplitter
-Simple Livesplit ASL autosplitter for Skin Deep. Supports autosplitting and load removal. Does not support fullgame autoreset as of right now.
+Simple Livesplit ASL autosplitter for Skin Deep. Supports autosplitting and load removal. Does not support fullgame autoreset as of right now. Currently only supports version 2025.05.05.2010, but will support more in the future.
 
 # Settings
 **Dont split when leaving vig_hub**
